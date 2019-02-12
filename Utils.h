@@ -1,12 +1,18 @@
 #ifndef TP1_UTILS_H
 #define TP1_UTILS_H
 
-#include <ostream>
-#include <istream>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
+using std::string;
 
 struct Vecteur {
     float xyz[ 3 ]; // les composantes
     // constructeur
+    Vecteur() = default;;
     Vecteur( float x, float y, float z ): xyz{x, y, z} {}
 
     // accesseur en ecriture
@@ -51,6 +57,25 @@ inline
 std::istream& operator>>( std::istream& in, Triangle& t )
 { in >> t[ 0 ] >> t[ 1 ] >> t[ 2 ];
     return in;}
+
+struct TriangleSoup {
+    std::vector<Triangle> triangles; // les triangles
+    TriangleSoup() = default;
+    void read( std::istream& in ) {
+        string inputLine;
+
+        // lecture de chaque ligne
+        while(getline(in,inputLine)) {
+            if (!inputLine.empty() && inputLine[0] != '#') {
+                std::istringstream ss(inputLine);
+                Vecteur v1{}, v2{}, v3{};
+                ss >> v1 >> v2 >> v3;
+                Triangle t(v1, v2, v3);
+                triangles.push_back(t);
+            }
+        }
+    }
+};
 
 
 #endif //TP1_UTILS_H
