@@ -17,7 +17,7 @@ void Viewer::draw()
     glColor4fv(colorBronzeDiff);
     for (Triangle t : ptrSoup->triangles ) {
         for (Vecteur v : t.sommets){
-            glVertex3f( v.xyz[0], v.xyz[1], v.xyz[2] );
+            glVertex3f( v[0], v[1], v[2] );
         }
     }
     glEnd();
