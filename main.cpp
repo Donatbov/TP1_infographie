@@ -13,16 +13,13 @@ int main(int argc, char** argv) {
     TriangleSoup ts;
     ts.read(input);
 
-    /*for (Triangle t : ts.triangles ) {
-        cout << t << "\n";
-    }*/
     cout << ts.triangles.size() << endl;
 
 
     // Read command lines arguments.
     QApplication application(argc,argv);
     // Instantiate the viewer.
-    Viewer viewer;
+    Viewer viewer(&ts);
     // Give a name
     viewer.setWindowTitle("Viewer triangle soup");
     // Make the viewer window visible on screen.

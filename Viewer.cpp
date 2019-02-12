@@ -8,27 +8,18 @@ using namespace std;
 void Viewer::draw()
 {
     float colorBronzeDiff[4] = { 0.8, 0.6, 0.0, 1.0 };
-    float colorRedDiff   [4] = { 1.0, 0.0, 0.0, 1.0 };
+    /*float colorRedDiff   [4] = { 1.0, 0.0, 0.0, 1.0 };
     float colorGreenDiff [4] = { 0.0, 1.0, 0.0, 1.0 };
-    float colorBlueDiff  [4] = { 0.0, 0.0, 1.0, 1.0 };
+    float colorBlueDiff  [4] = { 0.0, 0.0, 1.0, 1.0 };*/
+
     // Draws triangles given by 3 vertices.
     glBegin(GL_TRIANGLES);
     glColor4fv(colorBronzeDiff);
-    glVertex3f( 0.0, 0.0, 0.0 );
-    glVertex3f( 1.0, 0.0, 0.0 );
-    glVertex3f( 0.0, 1.0, 0.0 );
-    glColor4fv(colorRedDiff);
-    glVertex3f( 1.0, 0.0, 0.0 );
-    glVertex3f( 0.0, 1.0, 0.0 );
-    glVertex3f( 0.0, 0.0, 1.0 );
-    glColor4fv(colorGreenDiff);
-    glVertex3f( 0.0, 0.0, 0.0 );
-    glVertex3f( 0.0, 1.0, 0.0 );
-    glVertex3f( 0.0, 0.0, 1.0 );
-    glColor4fv(colorBlueDiff);
-    glVertex3f( 1.0, 0.0, 0.0 );
-    glVertex3f( 0.0, 0.0, 0.0 );
-    glVertex3f( 0.0, 0.0, 1.0 );
+    for (Triangle t : ptrSoup->triangles ) {
+        for (Vecteur v : t.sommets){
+            glVertex3f( v.xyz[0], v.xyz[1], v.xyz[2] );
+        }
+    }
     glEnd();
 }
 void Viewer::init()
