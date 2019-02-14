@@ -28,6 +28,19 @@ void Viewer::init()
     restoreStateFromFile();
     // Opens help window
     //help();
+    Vecteur low,up;
+    low = Vecteur();
+    up = Vecteur();
+    ptrSoup->boundingBox(low,up);
+    qglviewer::Vec vecLow, vecUp;
+    vecLow = qglviewer::Vec(static_cast<qreal>(low[0]),
+                            static_cast<qreal>(low[1]),
+                            static_cast<qreal>(low[2]));
+    vecUp = qglviewer::Vec( static_cast<qreal>(up[0]),
+                            static_cast<qreal>(up[1]),
+                            static_cast<qreal>(up[2]));
+    camera()->setSceneBoundingBox(vecLow,vecUp);
+    camera()->showEntireScene();
 }
 QString Viewer::helpString() const
 {

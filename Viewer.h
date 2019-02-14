@@ -4,6 +4,8 @@
 #include <vector>
 #include <QGLViewer/qglviewer.h>
 #include "Utils.h"
+#include <QGLViewer/vec.h>
+
 class Viewer : public QGLViewer
 {
 public:

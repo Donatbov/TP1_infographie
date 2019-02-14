@@ -15,6 +15,13 @@ int main(int argc, char** argv) {
 
     cout << ts.triangles.size() << endl;
 
+    /*
+    // tests inf & max :
+    Vecteur v1(1,1,1);
+    Vecteur v2(2,0,1);
+    cout << "min :" << v1.inf(v2) << "\n";
+    cout << "max :" << v1.sup(v2) << "\n";
+    */
 
     // Read command lines arguments.
     QApplication application(argc,argv);
