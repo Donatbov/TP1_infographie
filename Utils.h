@@ -8,6 +8,7 @@
 #include <string>
 #include <limits>
 #include <math.h>
+#include <map>
 
 using namespace std;
 
@@ -187,10 +188,31 @@ struct Index {
 
 };
 
+// Structure pour calculer le barycentre d'un ensemble de points.
+struct CellData {
+  Vecteur acc;
+  int nb;
+  // Crée un accumulateur vide.
+  CellData(): acc({0,0,0}), nb(0) {}
+  // Ajoute le point v à l'accumulateur.
+  void add( const Vecteur& v ){
+      for(int i = 0 ; i < 3 ; i++){
+          acc[i] += v[i];
+      }
+      nb++;
+  }
+  // Retourne le barycentre de tous les points ajoutés.
+  Vecteur barycenter() const{
+      return Vecteur(acc[0]/nb,acc[1]/nb,acc[2]/nb);
+  }
+};
+
 
 struct TriangleSoupZipper {
     Vecteur cellSize;
     Vecteur low, up;
+    // Stocke pour chaque cellule son barycentre.
+    std::map<Index, CellData> index2data;
 
     // Construit le zipper avec une soupe de triangle en entrée \a
     // anInput, une soupe de triangle en sortie \a anOutput, et un index \a size
@@ -209,7 +231,7 @@ struct TriangleSoupZipper {
         cellSize[1] = boundingBoxSizeY / size[1];
         cellSize[2] = boundingBoxSizeZ / size[2];
 
-        zip(anInput, anOuput);
+        smartZip(anInput, anOuput);
     }
 
     void zip(const TriangleSoup& anInput, TriangleSoup& anOuput){
@@ -217,9 +239,30 @@ struct TriangleSoupZipper {
         for(Triangle t : anInput.triangles){
             // on vérifie si tous ses sommets ont un index différent
             if (areInDifferentsCell(t[0], t[1], t[2])){
+                Index indexes[3] {index(t[0]), index(t[1]), index(t[2])};
                 // si oui, on crée un triangle aux centre de la cellule
-                anOuput.triangles.emplace_back(centroid(index(t[0])), centroid(index(t[1])), centroid(index(t[2])));
+                anOuput.triangles.emplace_back(centroid(indexes[0]), centroid(indexes[1]), centroid(indexes[2]));
+                for(int i = 0 ; i < 3 ; i++){
+                    if ( index2data.find(indexes[i]) == index2data.end() ) {
+                      index2data.insert ( std::pair<Index, CellData>(indexes[i],CellData()) );
+                    }
+                    index2data[indexes[i]].add(t[i]);
+                }
+
             }// Sinon, on ne l'ajoute pas
+        }
+    }
+
+    void smartZip(const TriangleSoup& anInput, TriangleSoup& anOuput){
+        index2data.clear();
+        zip(anInput,anOuput);
+        //for(Triangle t : anOuput.triangles){
+        for(int i = 0 ; i<anOuput.triangles.size() ; i++){
+            Index indexes[3] {index(anOuput.triangles[i][0]),
+                        index(anOuput.triangles[i][1]), index(anOuput.triangles[i][2])};
+            for(int j = 0 ; j<3 ; j++){
+                anOuput.triangles[i][j] = Vecteur(index2data[indexes[j]].barycenter());
+            }
         }
     }
 
@@ -237,6 +280,5 @@ struct TriangleSoupZipper {
         return (index(u) != index(v) && index(u) != index(w) && index(v) != index(w));
     }
 };
-
 
 #endif //TP1_UTILS_H
