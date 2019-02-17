@@ -9,7 +9,7 @@
 #include <limits>
 #include <math.h>
 
-using std::string;
+using namespace std;
 
 struct Vecteur {
     float xyz[ 3 ]; // les composantes
@@ -62,7 +62,7 @@ struct Vecteur {
 
 inline
 std::ostream& operator<<( std::ostream& out, Vecteur v )
-{ out << "{" << v[ 0 ] << " " << v[ 1 ] << " " << v[ 2 ] << "}";
+{ out << v[ 0 ] << " " << v[ 1 ] << " " << v[ 2 ];
     return out;}
 inline
 std::istream& operator>>( std::istream& in, Vecteur& v )
@@ -101,7 +101,7 @@ struct Triangle{
 
 inline
 std::ostream& operator<<( std::ostream& out, Triangle t )
-{ out << "triangle: " << t[ 0 ] << " " << t[ 1 ] << " " << t[ 2 ];
+{ out << t[ 0 ] << " " << t[ 1 ] << " " << t[ 2 ];
     return out;}
 inline
 std::istream& operator>>( std::istream& in, Triangle& t )
@@ -109,21 +109,34 @@ std::istream& operator>>( std::istream& in, Triangle& t )
     return in;}
 
 struct TriangleSoup {
-    std::vector<Triangle> triangles; // les triangles
+    vector<Triangle> triangles; // les triangles
+
     TriangleSoup() = default;
-    void read( std::istream& in ) {
+
+    void read( istream& in ) {
         string inputLine;
 
         // lecture de chaque ligne
         while(getline(in,inputLine)) {
             if (!inputLine.empty() && inputLine[0] != '#') {
-                std::istringstream ss(inputLine);
+                istringstream ss(inputLine);
                 Vecteur v1{}, v2{}, v3{};
                 ss >> v1 >> v2 >> v3;
                 Triangle t(v1, v2, v3);
                 triangles.push_back(t);
             }
         }
+    }
+
+    void write(ofstream& out) {
+
+        //# TRISOUP generated from obj2trisoup
+        out << "# TRISOUP generated from compressor " << endl;
+        for (Triangle t : triangles){
+            out << t << endl;
+        }
+
+        out.close();
     }
 
     void boundingBox( Vecteur& low, Vecteur& up) const{
@@ -202,7 +215,7 @@ struct TriangleSoupZipper {
     void zip(const TriangleSoup& anInput, TriangleSoup& anOuput){
         //pour chaque triangle de la soupe
         for(Triangle t : anInput.triangles){
-            // on vérifie si tous ses sommets un index différent
+            // on vérifie si tous ses sommets ont un index différent
             if (areInDifferentsCell(t[0], t[1], t[2])){
                 // si oui, on crée un triangle aux centre de la cellule
                 anOuput.triangles.emplace_back(centroid(index(t[0])), centroid(index(t[1])), centroid(index(t[2])));
