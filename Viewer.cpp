@@ -8,6 +8,7 @@ using namespace std;
 void Viewer::draw()
 {
     float colorBronzeDiff[4] = { 0.8, 0.6, 0.0, 1.0 };
+    float colorBronzeSpec[4] = { 1.0, 1.0, 0.4, 1.0 };
     /*float colorRedDiff   [4] = { 1.0, 0.0, 0.0, 1.0 };
     float colorGreenDiff [4] = { 0.0, 1.0, 0.0, 1.0 };
     float colorBlueDiff  [4] = { 0.0, 0.0, 1.0, 1.0 };*/
@@ -15,7 +16,12 @@ void Viewer::draw()
     // Draws triangles given by 3 vertices.
     glBegin(GL_TRIANGLES);
     glColor4fv(colorBronzeDiff);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, colorBronzeDiff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
+    glMaterialf(GL_FRONT, GL_SHININESS, 20.0f );
     for (Triangle t : ptrSoup->triangles ) {
+        Vecteur n = t.normal();
+        glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
         for (Vecteur v : t.sommets){
             glVertex3f( v[0], v[1], v[2] );
         }

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <limits>
+#include <math.h>
 
 using std::string;
 
@@ -44,6 +45,19 @@ struct Vecteur {
         return max;
     }
 
+    float norme() const{
+        float res = sqrtf(powf(this->xyz[0],2)+powf(this->xyz[1],2)+powf(this->xyz[2],2));
+        return res;
+    }
+
+    Vecteur cross( const Vecteur& v ) const{
+        Vecteur res = Vecteur();
+        res[0] = (this->xyz[1]*v[2])-(this->xyz[2]*v[1]);
+        res[1] = (this->xyz[2]*v[0])-(this->xyz[0]*v[2]);
+        res[2] = (this->xyz[0]*v[1])-(this->xyz[1]*v[0]);
+        return res;
+    }
+
 };
 
 inline
@@ -67,6 +81,21 @@ struct Triangle{
     // accesseur en lecture
     Vecteur operator[]( int i ) const {
         return sommets[i];
+    }
+
+    Vecteur normal() const{
+        Vecteur s0s1 = Vecteur( this->sommets[0][0]-this->sommets[1][0],
+                                this->sommets[0][1]-this->sommets[1][1],
+                                this->sommets[0][2]-this->sommets[1][2]);
+        Vecteur s0s2 = Vecteur( this->sommets[0][0]-this->sommets[2][0],
+                                this->sommets[0][1]-this->sommets[2][1],
+                                this->sommets[0][2]-this->sommets[2][2]);
+        Vecteur n = s0s1.cross(s0s2);
+        float norme = n.norme();
+        for (int i = 0; i < 3 ; i++) {
+            n[i] /= norme;
+        }
+        return n;
     }
 };
 
