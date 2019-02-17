@@ -11,9 +11,14 @@ using namespace std;
 int main(int argc, char** argv) {
     std::ifstream input( argv[1] );
     TriangleSoup ts;
+    TriangleSoup zippedTs;
+
     ts.read(input);
 
+    TriangleSoupZipper(ts, zippedTs, Index(50,50,50));
+
     cout << ts.triangles.size() << endl;
+    cout << zippedTs.triangles.size() << endl;
 
     /*
     // tests inf & max :
@@ -23,10 +28,11 @@ int main(int argc, char** argv) {
     cout << "max :" << v1.sup(v2) << "\n";
     */
 
+
     // Read command lines arguments.
     QApplication application(argc,argv);
     // Instantiate the viewer.
-    Viewer viewer(&ts);
+    Viewer viewer(&zippedTs);
     // Give a name
     viewer.setWindowTitle("Viewer triangle soup");
     // Make the viewer window visible on screen.

@@ -12,9 +12,10 @@ void Viewer::draw()
     /*float colorRedDiff   [4] = { 1.0, 0.0, 0.0, 1.0 };
     float colorGreenDiff [4] = { 0.0, 1.0, 0.0, 1.0 };
     float colorBlueDiff  [4] = { 0.0, 0.0, 1.0, 1.0 };*/
-
     // Draws triangles given by 3 vertices.
     glBegin(GL_TRIANGLES);
+
+
     glColor4fv(colorBronzeDiff);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, colorBronzeDiff);
     glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
@@ -26,8 +27,29 @@ void Viewer::draw()
             glVertex3f( v[0], v[1], v[2] );
         }
     }
+
+    /*
+    // Partie effet "Elmer" :
+    float colorBlack[4] = { 0, 0, 0, 1.0 };
+    glEnable(GL_COLOR_MATERIAL);
+    glColor4fv(colorBlack);
+    for (Triangle t : ptrSoup->triangles ) {
+        Vecteur n = t.normal();
+        glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
+        float intpart;
+        float color[4] = {abs(modf(t[0][0],&intpart)),abs(modf(t[0][1],&intpart)), abs(modf(t[0][2],&intpart)), 1.0};
+        glMaterialfv(GL_FRONT, GL_SPECULAR, color);
+        for (Vecteur v : t.sommets){
+            glVertex3f( v[0], v[1], v[2] );
+        }
+    }
+    glDisable(GL_COLOR_MATERIAL);
+    */
+
     glEnd();
 }
+
+
 void Viewer::init()
 {
     // Restore previous viewer state.
@@ -48,6 +70,8 @@ void Viewer::init()
     camera()->setSceneBoundingBox(vecLow,vecUp);
     camera()->showEntireScene();
 }
+
+
 QString Viewer::helpString() const
 {
     QString text("<h2>S i m p l e V i e w e r</h2>");

@@ -46,7 +46,7 @@ struct Vecteur {
     }
 
     float norme() const{
-        float res = sqrtf(powf(this->xyz[0],2)+powf(this->xyz[1],2)+powf(this->xyz[2],2));
+        float res = sqrtf(this->xyz[0]*this->xyz[0] + this->xyz[1]*this->xyz[1] + this->xyz[2]*this->xyz[2]);
         return res;
     }
 
@@ -138,6 +138,90 @@ struct TriangleSoup {
             low = low.inf((t[0].inf(t[1].inf(t[2]))));
             up = low.sup((t[0].sup(t[1].sup(t[2]))));
         }
+    }
+};
+
+/// Définit un index sur 3 entiers. Toutes les opérations usuelles
+/// sont surchargées (accès, comparaisons, égalité).
+struct Index {
+    int idx[ 3 ];
+    Index() = default;
+    Index( int i0, int i1, int i2 ): idx{i0, i1, i2} {}
+    Index( int indices[] ): idx{indices[0], indices[1], indices[2]} {}
+
+    int  operator[]( int i ) const { return idx[ i ]; }
+    int& operator[]( int i )       { return idx[ i ]; }
+    bool operator<( const Index& other ) const
+    {
+        return ( idx[ 0 ] < other.idx[ 0 ] )
+               || ( ( idx[ 0 ] == other.idx[ 0 ] )
+                    && ( ( idx[ 1 ] < other.idx[ 1 ] )
+                         || ( ( idx[ 1 ] == other.idx[ 1 ] )
+                              && ( idx[ 2 ] < other.idx[ 2 ] ) ) ) );
+    }
+
+    bool operator==( const Index& other ) const
+    {
+        return ( idx[ 0 ] == other.idx[ 0 ]
+                &&  idx[ 1 ] == other.idx[ 1 ]
+                &&  idx[ 2 ] == other.idx[ 2 ]);
+    }
+
+    bool operator!=( const Index& other ) const
+    {
+        return ! (*this == other);
+    }
+
+};
+
+
+struct TriangleSoupZipper {
+    Vecteur cellSize;
+    Vecteur low, up;
+
+    // Construit le zipper avec une soupe de triangle en entrée \a
+    // anInput, une soupe de triangle en sortie \a anOutput, et un index \a size
+    // qui est le nombre de cellules de la boîte découpée selon les 3 directions.
+    TriangleSoupZipper( const TriangleSoup& anInput, TriangleSoup& anOuput, Index size ){
+        // Calcul de la boite englobante
+        low = Vecteur();
+        up = Vecteur();
+        anInput.boundingBox(low,up);
+
+        // Calcul de la taille d'une cellule
+        float boundingBoxSizeX = up[0] - low[0];
+        float boundingBoxSizeY = up[1] - low[1];
+        float boundingBoxSizeZ = up[2] - low[2];
+        cellSize[0] = boundingBoxSizeX / size[0];
+        cellSize[1] = boundingBoxSizeY / size[1];
+        cellSize[2] = boundingBoxSizeZ / size[2];
+
+        zip(anInput, anOuput);
+    }
+
+    void zip(const TriangleSoup& anInput, TriangleSoup& anOuput){
+        //pour chaque triangle de la soupe
+        for(Triangle t : anInput.triangles){
+            // on vérifie si tous ses sommets un index différent
+            if (areInDifferentsCell(t[0], t[1], t[2])){
+                // si oui, on crée un triangle aux centre de la cellule
+                anOuput.triangles.emplace_back(centroid(index(t[0])), centroid(index(t[1])), centroid(index(t[2])));
+            }// Sinon, on ne l'ajoute pas
+        }
+    }
+
+    /// @return l'index de la cellule dans laquelle tombe \a p.
+    Index index( const Vecteur& p ) const{
+        return {(int)((p[0]-low[0])/cellSize[0]), (int)((p[1]-low[1])/cellSize[1]), (int)((p[2]-low[2])/cellSize[2])};
+    }
+
+    /// @return le centroïde de la cellule d'index \a idx (son "centre").
+    Vecteur centroid( const Index& idx ) const{
+        return {(float)(cellSize[0]*(idx[0]+ 0.5) + low[0]), (float)(cellSize[1]*(idx[1]+ 0.5) + low[1]), (float)(cellSize[2]*(idx[2]+ 0.5) + low[2])};
+    }
+
+    bool areInDifferentsCell(const Vecteur& u, const Vecteur& v, const Vecteur& w) const {
+        return (index(u) != index(v) && index(u) != index(w) && index(v) != index(w));
     }
 };
 
