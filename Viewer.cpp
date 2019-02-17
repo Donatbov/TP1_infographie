@@ -16,6 +16,8 @@ void Viewer::draw()
     glBegin(GL_TRIANGLES);
 
 
+
+
     glColor4fv(colorBronzeDiff);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, colorBronzeDiff);
     glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
